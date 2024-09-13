@@ -9,7 +9,7 @@ export const getTickets = async (req: Request, res: Response): Promise<void> => 
         deletedAt: null
       }
     });
-    res.json(await tickets);
+    res.status(200).json(await tickets);
   } catch (error) {
     console.error('Error fetching tickets:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -22,7 +22,7 @@ export const getTicketById = async (req: Request, res: Response): Promise<void> 
     const ticket: Promise<Ticket | null> = prisma.ticket.findUnique({
       where: { id: ticketId},
     });
-    res.json(await ticket);
+    res.status(200).json(await ticket);
   } catch (error) {
     console.error('Error fetching ticket by ID:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -46,7 +46,7 @@ export const createTicket = async (req: Request, res: Response): Promise<void> =
         status: "OPEN"
       },
     });
-    res.json(await ticket);
+    res.status(201).json(await ticket);
   } catch (error) {
     console.error('Error creating ticket:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -72,7 +72,7 @@ export const updateTicket = async (req: Request, res: Response): Promise<void> =
         status,
       },
     });
-    res.json(await ticket);
+    res.status(200).json(await ticket);
   } catch (error) {
     console.error('Error updating ticket:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -88,7 +88,7 @@ export const deleteTicket = async (req: Request, res: Response): Promise<void> =
         deletedAt: new Date(),
       },
     });
-    res.json(await deletedTicket);
+    res.status(200).json(await deletedTicket);
   } catch (error) {
     console.error('Error deleting ticket:', error);
     res.status(500).json({ error: 'Internal server error' });
