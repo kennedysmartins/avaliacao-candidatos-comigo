@@ -6,6 +6,7 @@
     "start": "node dist/app.js",
     "dev": "tsx watch ./src/app.ts",
     "build": "npm i && tsc",
+    "seed": "tsx ./prisma/seed.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
