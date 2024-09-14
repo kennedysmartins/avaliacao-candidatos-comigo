@@ -1,6 +1,6 @@
 // src/prisma/seed.ts
-import { PrismaClient } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import { ContactType, PrismaClient, TicketStatus } from "@prisma/client";
+import * as bcrypt from "bcrypt";
 
 /* 
   Run with `npm run seed`
@@ -8,68 +8,76 @@ import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
+async function createUser(email: string, name: string, password: string, role: "ADMIN" | "ATTENDANT") {
+  return prisma.user.upsert({
+    where: { email },
+    update: {},
+    create: {
+      id: crypto.randomUUID(),
+      name,
+      email,
+      password: await bcrypt.hash(password, 10),
+      role,
+    },
+  });
+}
+function getRandomElement<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getRandomReason() {
+  const reasons = ["Incidente", "Upgrade", "Teste", "Furto", "Danificado", "Instalação"];
+  return getRandomElement(reasons);
+}
+
+function getRandomDescription() {
+  const descriptions = [
+    "Testes de instalação",
+    "Veículo sem comunicação",
+    "Melhorias no veículo",
+    "Aparelho danificado",
+    "Aparelho corrompido",
+    "Nova instalação",
+  ];
+  return getRandomElement(descriptions);
+}
+
+async function createTickets(adminUserId: string, attendantUserId: string, quantity: number = 30) {
+  const customers = ["Kennedy", "Renata", "Rafael", "Vitória", "Lucas", "Amanda", "Joyce", "Deriki", "Rodrigo", "Camila"];
+  const vehicles = ["Logan", "Punto", "Gol", "Fusca", "C4", "Hb20", "Onix", "Chevette"];
+  const contactTypes: ContactType[] = ["EMAIL", "PHONE", "CHAT", "IN_PERSON"];
+  const statuses: TicketStatus[] = ["OPEN", "IN_PROGRESS", "CLOSED"];
+
+  const tickets = Array.from({ length: quantity }, async () => {
+    const assignedToId = Math.random() > 0.5 ? adminUserId : attendantUserId;
+
+    return prisma.ticket.create({
+      data: {
+        type: Math.random() > 0.5 ? "SUPPORT" : "SALES",
+        reason: getRandomReason(),
+        description: getRandomDescription(),
+        customer: getRandomElement(customers),
+        vehicle: getRandomElement(vehicles),
+        passiveContact: Math.random() > 0.5,
+        contactType: getRandomElement(contactTypes),
+        status: getRandomElement(statuses),
+        assignedTo: { connect: { id: assignedToId } },
+        createdAt: new Date(new Date().setDate(new Date().getDate() - Math.floor(Math.random() * 7))),
+        deadline: new Date(new Date().setDate(new Date().getDate() + Math.floor(Math.random() * 7) + 1)),
+      },
+    });
+  });
+
+  return Promise.all(tickets);
+}
+
 async function main() {
+  const adminUser = await createUser("admin@comigo.com", "Admin", "admin", "ADMIN");
+  const attendantUser = await createUser("atendente@comigo.com", "Atendente", "atendente", "ATTENDANT");
 
-  const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@comigo.com' },
-    update: {},
-    create: {
-      id: 'e79b83be-e1f2-4e53-9b5a-d9e32bc089f8',
-      name: 'Admin',
-      email: 'admin@comigo.com',
-      password: await bcrypt.hash('admin', 10),
-      role: 'ADMIN',
-    },
-  });
+  await createTickets(adminUser.id, attendantUser.id, 30);
 
-  const attendantUser = await prisma.user.upsert({
-    where: { email: 'atendente@comigo.com' },
-    update: {},
-    create: {
-      id: 'd231ad93-d83e-4d10-bf92-bbb3bb1cd8bc',
-      name: 'Atendente',
-      email: 'atendente@comigo.com',
-      password: await bcrypt.hash('atendente', 10),
-      role: 'ATTENDANT',
-    },
-  });
-
-  const ticket1 = await prisma.ticket.create({
-    data: {
-      type: 'SUPPORT',
-      reason: 'Problema com login',
-      description: 'Usuário não consegue acessar o sistema.',
-      customer: 'João da Silva',
-      vehicle: 'Gol',
-      passiveContact: false,
-      contactType: 'EMAIL',
-      status: 'OPEN',
-      assignedTo: {
-        connect: { id: attendantUser.id },
-      },
-      deadline: new Date(new Date().setDate(new Date().getDate() + 3)),
-    },
-  });
-
-  const ticket2 = await prisma.ticket.create({
-    data: {
-      type: 'SALES',
-      reason: 'Dúvida sobre plano de vendas',
-      description: 'Cliente quer saber mais sobre o plano premium.',
-      customer: 'Maria Souza',
-      vehicle: 'Logan',
-      passiveContact: true,
-      contactType: 'PHONE',
-      status: 'IN_PROGRESS',
-      assignedTo: {
-        connect: { id: adminUser.id },
-      },
-      deadline: new Date(new Date().setDate(new Date().getDate() + 3)),
-    },
-  });
-
-  console.log({ adminUser, attendantUser, ticket1, ticket2 });
-  console.log('Seeding completed.');
+  console.log("Seeding completed.");
 }
 
 main().finally(async () => {
