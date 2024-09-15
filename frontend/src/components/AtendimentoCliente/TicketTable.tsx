@@ -3,6 +3,7 @@
 import useAuthInfo from "@/hooks/useAuth";
 import { Ticket } from "@/lib/types";
 import { formatDate } from "@/lib/utils";
+import { useEffect, useState } from "react";
 import { BiEdit, BiTrash } from "react-icons/bi";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
@@ -65,35 +66,54 @@ const TicketRow = ({
   onEdit: (ticket: Ticket) => void;
   onDelete: (ticket: Ticket) => void;
   userRole: string | null;
-}) => (
-  <tr className='bg-white my-2 rounded-lg shadow-md hover:bg-blue-100 transition-colors duration-200'>
-    <td className='p-4'>{ticket.id}</td>
-    <td className='p-4'>{typeDictionary[ticket.type] || ticket.type}</td>
-    <td className='p-4'>{ticket.reason}</td>
-    <td className='p-4'>{ticket.description}</td>
-    <td className='p-4'>{ticket.customer}</td>
-    <td className='p-4'>{ticket.vehicle}</td>
-    <td className='p-4'>{formatDate(ticket.createdAt)}</td>
-    <td className='p-4'>
-      {ticket.deadline ? formatDate(ticket.deadline) : "-"}
-    </td>
-    <td className='p-4'>{statusDictionary[ticket.status] || ticket.status}</td>
-    <td className='p-4 flex items-center gap-4'>
-      <button
-        className='text-gray-600 hover:text-gray-900'
-        onClick={() => onEdit(ticket)}
-      >
-        <BiEdit className='h-5 w-5' />
-      </button>
-      {userRole === "ADMIN" && (
-        <button onClick={() => onDelete(ticket)}>
-          <BiTrash className='h-5 w-5 text-red-700' />
-        </button>
-      )}
-    </td>
-  </tr>
-);
+}) => {
+  const [isHighlighted, setIsHighlighted] = useState(false);
 
+  useEffect(() => {
+    const updatedRecently =
+      new Date().getTime() - new Date(ticket.updatedAt).getTime() < 3000;
+    if (updatedRecently) {
+      setIsHighlighted(true);
+      const timer = setTimeout(() => setIsHighlighted(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [ticket.updatedAt]);
+
+  return (
+    <tr
+      className={`bg-white my-2 rounded-lg shadow-md transition-colors duration-200 ${
+        isHighlighted ? "bg-blue-200" : "hover:bg-blue-100"
+      }`}
+    >
+      <td className='p-4'>{ticket.id}</td>
+      <td className='p-4'>{typeDictionary[ticket.type] || ticket.type}</td>
+      <td className='p-4'>{ticket.reason}</td>
+      <td className='p-4'>{ticket.description}</td>
+      <td className='p-4'>{ticket.customer}</td>
+      <td className='p-4'>{ticket.vehicle}</td>
+      <td className='p-4'>{formatDate(ticket.createdAt)}</td>
+      <td className='p-4'>
+        {ticket.deadline ? formatDate(ticket.deadline) : "-"}
+      </td>
+      <td className='p-4'>
+        {statusDictionary[ticket.status] || ticket.status}
+      </td>
+      <td className='p-4 flex items-center gap-4'>
+        <button
+          className='text-gray-600 hover:text-gray-900'
+          onClick={() => onEdit(ticket)}
+        >
+          <BiEdit className='h-5 w-5' />
+        </button>
+        {userRole === "ADMIN" && (
+          <button onClick={() => onDelete(ticket)}>
+            <BiTrash className='h-5 w-5 text-red-700' />
+          </button>
+        )}
+      </td>
+    </tr>
+  );
+};
 const TicketGridItem = ({
   ticket,
   onEdit,
