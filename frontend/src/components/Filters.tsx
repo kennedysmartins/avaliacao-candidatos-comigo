@@ -1,15 +1,22 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { FiChevronDown, FiSearch } from "react-icons/fi";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { getTicketsInput } from "@/lib/types";
+import { MdMenu, MdOutlineViewKanban } from "react-icons/md";
 
 interface FiltersProps {
   onFiltersChange: (filters: getTicketsInput["filters"]) => void;
+  onViewChange: (view: "list" | "grid") => void;
+  view: "list" | "grid";
 }
 
-export default function Filters({ onFiltersChange }: FiltersProps) {
+export default function Filters({
+  onFiltersChange,
+  onViewChange,
+  view,
+}: FiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -73,24 +80,33 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
   };
 
   const renderDropdown = (label: string, options: string[]) => (
-    <div className="relative">
+    <div className='relative'>
       <button
         onClick={() => toggleDropdown(label)}
-        className="flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 "
+        className='flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 '
       >
-        <span>{filters[label.toLowerCase() as keyof typeof filters] || label}</span>
-        <FiChevronDown className="w-4 h-4 ml-2 text-gray-400" aria-hidden="true" />
+        <span>
+          {filters[label.toLowerCase() as keyof typeof filters] || label}
+        </span>
+        <FiChevronDown
+          className='w-4 h-4 ml-2 text-gray-400'
+          aria-hidden='true'
+        />
       </button>
 
       {openDropdown === label && (
-        <div className="absolute z-10 w-56 mt-2 bg-white rounded-md shadow-lg ring-1 ring-primary ring-opacity-5">
-          <div className="py-1" role="menu" aria-orientation="vertical">
+        <div className='absolute z-10 w-56 mt-2 bg-white rounded-md shadow-lg ring-1 ring-primary ring-opacity-5'>
+          <div className='py-1' role='menu' aria-orientation='vertical'>
             {options.map((option, index) => (
               <Link
                 key={index}
-                href={pathname + "?" + createQueryString(label.toLowerCase(), option)}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                role="menuitem"
+                href={
+                  pathname +
+                  "?" +
+                  createQueryString(label.toLowerCase(), option)
+                }
+                className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100'
+                role='menuitem'
                 onClick={() => handleFilterChange(label.toLowerCase(), option)}
               >
                 {option}
@@ -119,34 +135,49 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
   };
 
   return (
-    <div className="bg-gray-100 p-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="relative flex-grow">
+    <div className='bg-gray-100 p-4 flex items-center justify-between w-full'>
+      <div className='flex flex-wrap items-center gap-2'>
+        <div className='relative flex-grow'>
           <input
-            type="text"
-            placeholder="Pesquisar"
+            type='text'
+            placeholder='Pesquisar'
             value={filters.search}
             onChange={(e) => handleFilterChange("search", e.target.value)}
-            className="w-full py-2 pr-10 pl-4 text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className='w-full py-2 pr-10 pl-4 text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'
           />
-          <FiSearch className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+          <FiSearch className='absolute right-3 top-2.5 h-5 w-5 text-gray-400' />
         </div>
 
         {renderDropdown("Periodo", ["Hoje", "Esta semana", "Este mês"])}
-        {renderDropdown("Ordenado por", ["Data da abertura", "Data de fechamento"])}
+        {renderDropdown("Ordenado por", [
+          "Data da abertura",
+          "Data de fechamento",
+        ])}
         {renderDropdown("Status", ["Em andamento", "Concluído", "Cancelado"])}
         {renderDropdown("Tipo", ["Tipo 1", "Tipo 2", "Tipo 3"])}
         {renderDropdown("Motivo", ["Motivo 1", "Motivo 2", "Motivo 3"])}
         {renderDropdown("Cliente", ["Cliente 1", "Cliente 2", "Cliente 3"])}
         {renderDropdown("Veículo", ["Veículo 1", "Veículo 2", "Veículo 3"])}
 
-        <div className="bg-gray-300 w-[1px] h-6"></div>
+        <div className='bg-gray-300 w-px h-6'></div>
         <button
-          className="flex items-center px-3 py-2 text-sm font-medium text-gray-700  rounded-md hover:bg-gray-50 focus:outline-none"
+          className='flex items-center px-3 py-2 text-sm font-medium text-gray-700  rounded-md hover:bg-gray-50 focus:outline-none'
           onClick={clearFilters}
         >
           Remover filtros
         </button>
+      </div>
+      <div className='flex gap-2 items-center'>
+        <MdMenu
+          size={25}
+          onClick={() => onViewChange("list")}
+          className={`cursor-pointer ${view === "list" && "text-primary"}`}
+        />
+        <MdOutlineViewKanban
+          size={23}
+          onClick={() => onViewChange("grid")}
+          className={`cursor-pointer ${view === "grid" && "text-primary"}`}
+        />
       </div>
     </div>
   );
