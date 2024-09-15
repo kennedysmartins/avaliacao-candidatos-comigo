@@ -57,12 +57,23 @@ const Modal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => 
               backgroundColor: 'white',
               boxShadow: '-2px 0 5px rgba(0, 0, 0, 0.1)',
               zIndex: 1000,
+              overflowY: 'scroll',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
             }}
           >
-            <div style={{ padding: '20px' }}>
+            <div style={{
+              height: '100%',
+            }}>
               {children}
             </div>
           </motion.div>
+          <style jsx>{`
+            ::-webkit-scrollbar {
+              width: 0px;
+              background: transparent;
+            }
+          `}</style>
         </>
       )}
     </AnimatePresence>
