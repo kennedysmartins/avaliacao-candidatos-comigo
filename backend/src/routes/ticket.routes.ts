@@ -10,6 +10,7 @@ router.use(verifyToken).get("/", ticketController.getTickets);
 router.use(verifyToken).get("/:id", ticketController.getTicketById);
 router.use(verifyToken).post("/", validateData(ticketSchema), ticketController.createTicket);
 router.use(verifyToken).put("/:id", validateData(ticketSchema), ticketController.updateTicket);
+router.use(verifyToken).patch("/:id/restore", ticketController.restoreTicket);
 router.use(verifyToken).delete("/:id", ticketController.deleteTicket);
 
 export default router

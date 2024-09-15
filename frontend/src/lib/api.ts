@@ -144,13 +144,26 @@ export const updateTicket = async (
   }
 };
 
-export const deleteTicket = async (
+export const deleteTicketApi = async (
   id: string
-): Promise<{ data: { success: boolean } }> => {
+): Promise<Ticket> => {
   try {
-    return await axiosInstance.delete(`${API_BASE_URL}/tickets/${id}`);
+    const response = await axiosInstance.delete(`${API_BASE_URL}/tickets/${id}`);
+    return response.data;
   } catch (error) {
     console.error("Delete ticket error:", error);
+    throw error;
+  }
+};
+
+export const undoDeletedTicketApi = async (
+  id: string
+): Promise<Ticket> => {
+  try {
+    const response = await axiosInstance.patch(`${API_BASE_URL}/tickets/${id}/restore`);
+    return response.data;
+  } catch (error) {
+    console.error("Undo delete ticket error:", error);
     throw error;
   }
 };

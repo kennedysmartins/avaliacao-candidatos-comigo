@@ -208,3 +208,22 @@ export const deleteTicket = async (
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const restoreTicket = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const ticketId = parseInt(req.params.id);
+    const restoredTicket = await prisma.ticket.update({
+      where: { id: ticketId },
+      data: {
+        deletedAt: null,
+      },
+    });
+    res.status(200).json(restoredTicket);
+  } catch (error) {
+    console.error("Error restoring ticket:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

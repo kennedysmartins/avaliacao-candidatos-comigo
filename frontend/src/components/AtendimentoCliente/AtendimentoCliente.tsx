@@ -2,14 +2,15 @@
 import React, { useEffect, useState } from "react";
 import Button from "../Button";
 import Filters from "../Filters";
-import TicketTable from "../Table";
+import TicketTable from "./TicketTable";
 import { BsPlus } from "react-icons/bs";
-import { getTickets } from "@/lib/api";
+import { deleteTicketApi, getTickets, undoDeletedTicketApi } from "@/lib/api";
 import { getTicketsInput, Ticket } from "@/lib/types";
 import Pagination from "../Pagination";
 import Modal from "../Modal";
 import FormAddTicket from "./FormAddTicket";
 import FormEditTicket from "./FormEditTicket";
+import { toast } from "sonner";
 
 const AtendimentoCliente = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -49,15 +50,48 @@ const AtendimentoCliente = () => {
     }
   };
 
+  const deleteTicket = async (ticketId: string) => {
+    try {
+      const response = await deleteTicketApi(ticketId);
+      if (response.id) {
+        toast.success("Ticket excluído com sucesso!", {
+          duration: 5000,
+          action: {
+            label: "Restaurar",
+            onClick: async () => {
+              await undoDeletedTicket(ticketId);
+            },
+          },
+        });
+        fetchTickets(filters);
+      }
+    } catch (error) {
+      console.error("Erro ao excluir ticket:", error);
+    }
+  };
+
+  const undoDeletedTicket = async (ticketId: string) => {
+    try {
+      const response = await undoDeletedTicketApi(ticketId);
+      if (response.id) {
+        toast.success("Ticket restaurado com sucesso!");
+        fetchTickets(filters);
+      }
+    } catch (error) {
+      console.error("Erro ao restaurar ticket:", error);
+    }
+  };
+
   useEffect(() => {
     fetchTickets(filters);
   }, [filters]);
 
+  // Avoid refetching when modals are closed unless filters change
   useEffect(() => {
     if (!isAddModalOpen && !isEditModalOpen) {
       fetchTickets(filters);
     }
-  }, [isAddModalOpen, isEditModalOpen, filters]);
+  }, [filters, isAddModalOpen, isEditModalOpen]);
 
   const handleFiltersChange = (newFilters: getTicketsInput["filters"]) => {
     setFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));
@@ -105,7 +139,9 @@ const AtendimentoCliente = () => {
         loading={loading}
         view={view}
         onEdit={handleOpenEditModal}
-        onDelete={(ticket) => console.log("Delete ticket:", ticket)}
+        onDelete={(ticket) => {
+          deleteTicket(String(ticket.id));
+        }}
       />
       <Pagination
         data={tickets}
