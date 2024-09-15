@@ -14,6 +14,7 @@ import FormEditTicket from "./FormEditTicket";
 const AtendimentoCliente = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [filters, setFilters] = useState<getTicketsInput["filters"]>({});
+  const [view, setView] = useState<"list" | "grid">("list");
   const [loading, setLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -28,10 +29,11 @@ const AtendimentoCliente = () => {
   const fetchTickets = async (appliedFilters: getTicketsInput["filters"]) => {
     try {
       setLoading(true);
-      const queryString = new URLSearchParams(appliedFilters as Record<string, string>).toString();
+      const queryString = new URLSearchParams(
+        appliedFilters as Record<string, string>
+      ).toString();
       const response = await getTickets({
         queryParams: queryString,
-        token: "",
       });
       setTickets(response.tickets);
       setPagination({
@@ -50,6 +52,12 @@ const AtendimentoCliente = () => {
   useEffect(() => {
     fetchTickets(filters);
   }, [filters]);
+
+  useEffect(() => {
+    if (!isAddModalOpen && !isEditModalOpen) {
+      fetchTickets(filters);
+    }
+  }, [isAddModalOpen, isEditModalOpen, filters]);
 
   const handleFiltersChange = (newFilters: getTicketsInput["filters"]) => {
     setFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));
@@ -76,7 +84,7 @@ const AtendimentoCliente = () => {
   const emptyTickets = Array(10).fill({} as Ticket);
 
   return (
-    <div className='px-8'>
+    <div className='px-8 mb-12'>
       <div className='flex gap-2 justify-start items-center'>
         <Button
           variant='filled'
@@ -86,14 +94,19 @@ const AtendimentoCliente = () => {
         >
           Abrir ticket
         </Button>
-        <Filters onFiltersChange={handleFiltersChange} />
+        <Filters
+          onFiltersChange={handleFiltersChange}
+          onViewChange={setView}
+          view={view}
+        />
       </div>
-          <TicketTable
-            tickets={loading ? emptyTickets : tickets}
-            loading={loading}
-            onEdit={handleOpenEditModal}
-            onDelete={(ticket) => console.log('Delete ticket:', ticket)}
-          />
+      <TicketTable
+        tickets={loading ? emptyTickets : tickets}
+        loading={loading}
+        view={view}
+        onEdit={handleOpenEditModal}
+        onDelete={(ticket) => console.log("Delete ticket:", ticket)}
+      />
       <Pagination
         data={tickets}
         count={pagination.count}
@@ -104,12 +117,16 @@ const AtendimentoCliente = () => {
         setPageSize={(size) => setPagination({ ...pagination, pageSize: size })}
       />
       <Modal isOpen={isAddModalOpen} onClose={handleCloseAddModal}>
-        <FormAddTicket />
+        <FormAddTicket onClose={handleCloseAddModal} />
       </Modal>
-        <Modal isOpen={isEditModalOpen} onClose={handleCloseEditModal}>
-          <FormEditTicket ticket={selectedTicket} />
-        </Modal>
+      <Modal isOpen={isEditModalOpen} onClose={handleCloseEditModal}>
+        <FormEditTicket
+          ticket={selectedTicket}
+          onClose={handleCloseEditModal}
+        />
+      </Modal>
     </div>
   );
 };
+
 export default AtendimentoCliente;
