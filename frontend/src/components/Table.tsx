@@ -38,7 +38,7 @@ const SkeletonGrid = () => (
 );
 
 const TicketRow = ({ ticket, onEdit, onDelete }: { ticket: Ticket, onEdit: (ticket: Ticket) => void, onDelete: (ticket: Ticket) => void }) => (
-  <tr className="bg-white my-2 rounded-lg shadow-md hover:bg-gray-100 transition-colors duration-200">
+  <tr className="bg-white my-2 rounded-lg shadow-md hover:bg-blue-100 transition-colors duration-200">
     <td className="p-4">{ticket.id}</td>
     <td className="p-4">{ticket.type}</td>
     <td className="p-4">{ticket.reason}</td>
