@@ -1,7 +1,12 @@
+"use client";
 import React from "react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
-const NavBar = ({ pageTitle }: { pageTitle: string }) => {
+const NavBar = () => {
+  const pathname = usePathname();
+  const pageTitle = pathname ? pathname.split('/').pop() || 'Home' : 'Home';
+
   return (
     <nav className='bg-primary text-white'>
       <div className='mx-auto px-8'>
@@ -15,7 +20,7 @@ const NavBar = ({ pageTitle }: { pageTitle: string }) => {
               className='mr-4'
             />
           </div>
-          <h1 className='text-sm font-normal'>{pageTitle}</h1>
+          <h1 className='text-sm font-normal'>{pageTitle.charAt(0).toUpperCase() + pageTitle.slice(1).toLowerCase().replace(/-/g, ' ')}</h1>
           <div className='flex items-center space-x-4'>
             <button className='p-2 rounded-full hover:bg-primary'>
               <svg
