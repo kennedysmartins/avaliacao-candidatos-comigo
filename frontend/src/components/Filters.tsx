@@ -1,6 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
-import { FiChevronDown, FiSearch, FiX } from "react-icons/fi";
+import { FiChevronDown, FiSearch } from "react-icons/fi";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { getTicketsInput } from "@/lib/types";
@@ -76,7 +76,7 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
     <div className="relative">
       <button
         onClick={() => toggleDropdown(label)}
-        className="flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        className="flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 "
       >
         <span>{filters[label.toLowerCase() as keyof typeof filters] || label}</span>
         <FiChevronDown className="w-4 h-4 ml-2 text-gray-400" aria-hidden="true" />
@@ -127,9 +127,9 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
             placeholder="Pesquisar"
             value={filters.search}
             onChange={(e) => handleFilterChange("search", e.target.value)}
-            className="w-full py-2 pl-10 pr-4 text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full py-2 pr-10 pl-4 text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
           />
-          <FiSearch className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+          <FiSearch className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
         </div>
 
         {renderDropdown("Periodo", ["Hoje", "Esta semana", "Este mês"])}
@@ -140,11 +140,11 @@ export default function Filters({ onFiltersChange }: FiltersProps) {
         {renderDropdown("Cliente", ["Cliente 1", "Cliente 2", "Cliente 3"])}
         {renderDropdown("Veículo", ["Veículo 1", "Veículo 2", "Veículo 3"])}
 
+        <div className="bg-gray-300 w-[1px] h-6"></div>
         <button
-          className="flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="flex items-center px-3 py-2 text-sm font-medium text-gray-700  rounded-md hover:bg-gray-50 focus:outline-none"
           onClick={clearFilters}
         >
-          <FiX className="w-4 h-4 mr-2 text-gray-400" />
           Remover filtros
         </button>
       </div>
