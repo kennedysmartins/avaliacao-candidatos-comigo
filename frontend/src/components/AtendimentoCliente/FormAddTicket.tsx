@@ -2,7 +2,7 @@
 
 import Button from "../Button";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TicketSchema, ticketSchema } from "@/schemas/ticketSchema";
 import { BsArrowLeft, BsArrowRight } from "react-icons/bs";
@@ -15,8 +15,13 @@ import {
   formatDateToInput,
 } from "@/lib/utils";
 import { FiSearch } from "react-icons/fi";
+import { toast } from "sonner";
+import { ContactType, TicketType } from "@/lib/types";
+import { createTicket } from "@/lib/api";
+import useAuthInfo from "@/hooks/useAuth";
 
-export default function TicketModal() {
+export default function FormAddTicket({onClose}: {onClose: () => void}) {
+  const user = useAuthInfo().userInfo
   const [step, setStep] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [editDeadline, setEditDeadline] = useState(false);
@@ -34,13 +39,34 @@ export default function TicketModal() {
     },
   });
 
-  const onSubmit = (data: TicketSchema) => {
-    console.log(data);
-    // Handle form submission
+  const onSubmit = async (data: TicketSchema) => {
+    const dataToSend = {
+      ...data,
+      passiveContact: data.passiveContact === "true" ? true : false,
+      contactType: data.contactType
+        ? (data.contactType as ContactType)
+        : null,
+      type: data.type as TicketType,
+      reason: data.reason ? data.reason : "",
+      deadline: data.deadline ? new Date(data.deadline) : undefined,
+      userId: user?.userId,
+    };
+    const response = await createTicket(dataToSend);
+
+    if(response) {
+    toast.success("Ticket criado com sucesso!");
+    onClose();
+    } else {
+      toast.error("Erro ao criar o ticket");
+    }
   };
 
-  const onError = (errors: any) => {
-    console.log(errors);
+  const onError = (error: FieldErrors<TicketSchema>) => {
+    console.log(error);
+    const errorMessages = Object.values(error).flatMap((err) =>
+      err ? [err.message] : []
+    );
+    errorMessages.forEach((message) => toast.error(message));
   };
 
   const typeOptions = [
@@ -120,7 +146,7 @@ export default function TicketModal() {
   const displayedReasons = filteredReasons.slice(0, 4);
 
   return (
-    <div className="pb-8">
+    <div className='pb-8'>
       <div className='p-6'>
         <p className='text-sm text-gray-600 mb-1'>Formulário de cadastro</p>
         <h2 className='text-xl font-semibold mb-4'>
@@ -169,38 +195,65 @@ export default function TicketModal() {
               {...register("customer")}
               type='text'
               placeholder='Nome'
+              required
               className='w-full p-3 mb-2 text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'
             />
+            {errors.customer && (
+              <p className='text-red-500 text-sm'>{errors.customer.message}</p>
+            )}
             <h3 className='text-lg font-semibold mb-2'>
               Houve contato passivo?
             </h3>
             <div className='flex mb-4 gap-4'>
-                <label className={`p-4 w-full text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${watch("passiveContact") === "true" && "bg-blue-100 border-blue-400 text-blue-800"}`}>
-                  <input
-                    {...register("passiveContact")}
-                    type='radio'
-                    value='true'
-                    className='mr-2'
-                  />
-                  Sim
-                  <p className={`text-gray-400 font-normal ${watch("passiveContact") === "true" && "text-primary"}`}>O cliente entrou em contato</p>
-                </label>
-                <label className={`p-4 w-full text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${watch("passiveContact") === "false" && "bg-blue-100 border-blue-400 text-blue-800"}`}>
-                  <input
-                    {...register("passiveContact")}
-                    type='radio'
-                    value='false'
-                    className='mr-2'
-                  />
-                  Não
-                  <p className={`text-gray-400 font-normal ${watch("passiveContact") === "false" && "text-primary"}`}>Contato ainda será feito</p>
-                </label>
+              <label
+                className={`p-4 w-full text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                  watch("passiveContact") === "true" &&
+                  "bg-blue-100 border-blue-400 text-blue-800"
+                }`}
+              >
+                <input
+                  {...register("passiveContact")}
+                  type='radio'
+                  value='true'
+                  className='mr-2'
+                />
+                Sim
+                <p
+                  className={`text-gray-400 font-normal ${
+                    watch("passiveContact") === "true" && "text-primary"
+                  }`}
+                >
+                  O cliente entrou em contato
+                </p>
+              </label>
+              <label
+                className={`p-4 w-full text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                  watch("passiveContact") === "false" &&
+                  "bg-blue-100 border-blue-400 text-blue-800"
+                }`}
+              >
+                <input
+                  {...register("passiveContact")}
+                  type='radio'
+                  value='false'
+                  className='mr-2'
+                />
+                Não
+                <p
+                  className={`text-gray-400 font-normal ${
+                    watch("passiveContact") === "false" && "text-primary"
+                  }`}
+                >
+                  Contato ainda será feito
+                </p>
+              </label>
             </div>
 
             {watch("passiveContact") !== "false" && (
               <div className='mb-4'>
                 <label className='block mb-2'>Tipo de contato</label>
                 <select
+                  required
                   {...register("contactType")}
                   className='w-full p-3 text-gray-700 bg-white border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'
                 >
@@ -210,6 +263,11 @@ export default function TicketModal() {
                   <option value='CHAT'>Chat</option>
                   <option value='IN_PERSON'>Pessoalmente</option>
                 </select>
+                {errors.contactType && (
+                  <p className='text-red-500 text-sm'>
+                    {errors.contactType.message}
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -229,12 +287,16 @@ export default function TicketModal() {
                   <input
                     type='radio'
                     value={option.value}
+                    required
                     {...register("type")}
                     className='mr-2'
                   />
                   {option.label}
                 </label>
               ))}
+              {errors.type && (
+                <p className='text-red-500 text-sm'>{errors.type.message}</p>
+              )}
             </div>
             <div className='mb-4'>
               <label className='block mb-2'>Veículo(s)</label>
@@ -287,6 +349,11 @@ export default function TicketModal() {
                     </div>
                   </label>
                 ))}
+                {errors.reason && (
+                  <p className='text-red-500 text-sm'>
+                    {errors.reason.message}
+                  </p>
+                )}
               </div>
             </div>
             <div className='mb-4 px-6'>
@@ -306,7 +373,7 @@ export default function TicketModal() {
                   onClick={() => setEditDeadline(!editDeadline)}
                 />
               </div>
-              <p className="mb-2">
+              <p className='mb-2'>
                 Informe o cliente que a resolução desse motivo está prevista em{" "}
                 {watch("deadline")
                   ? calculateBusinessDaysFromNow(

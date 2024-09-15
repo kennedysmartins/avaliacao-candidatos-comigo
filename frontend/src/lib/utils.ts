@@ -1,17 +1,21 @@
 export function formatDate(dataString: string | number | Date | null) {
-  if (!dataString) return 
-  const data = new Date(dataString)
+  if (!dataString) return;
+  const data = new Date(dataString);
   const options: Intl.DateTimeFormatOptions = {
     year: "numeric",
     month: "numeric",
     day: "numeric",
-  }
-  const formatadorDeData = new Intl.DateTimeFormat("pt-BR", options)
-  return formatadorDeData.format(data)
+  };
+  const formatadorDeData = new Intl.DateTimeFormat("pt-BR", options);
+  return formatadorDeData.format(data);
 }
 
-export const formatDateToInput = (date: Date | null) => {
-  if (!date) return
+export const formatDateToInput = (date: Date | string | null | undefined) => {
+  if (!date) return;
+  if (typeof date === "string") {
+    const [year, month, day] = date.split("-");
+    return `${year}-${month}-${day.slice(0, 2)}`;
+  }
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
@@ -32,7 +36,7 @@ export function calculateBusinessDaysFromNow(date: Date | string): number {
 
   while (now < targetDate) {
     const dayOfWeek = now.getDay();
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) { 
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
       count++;
     }
     now.setDate(now.getDate() + 1);
@@ -45,8 +49,8 @@ export function addBusinessDays(startDate: Date, days: number): Date {
   const result = new Date(startDate);
   let daysAdded = 0;
 
-  while (result.getDay() === 0 || result.getDay() === 6) { 
-    result.setDate(result.getDate() + 1); 
+  while (result.getDay() === 0 || result.getDay() === 6) {
+    result.setDate(result.getDate() + 1);
   }
 
   while (daysAdded <= days) {
