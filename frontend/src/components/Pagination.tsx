@@ -25,20 +25,22 @@ const Pagination: React.FC<PaginationProps> = ({
       <div className='flex justify-between items-center mt-4 w-full'>
         <div className='flex items-center space-x-2'>
           {Array.from({ length: totalPages }, (_, i) => i + 1)
-            .filter(page => page >= currentPage - 1 && page <= currentPage + 1)
+            .filter(
+              (page) => page >= currentPage - 1 && page <= currentPage + 1
+            )
             .map((page) => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={`px-3 py-1 ${
-                currentPage === page
-                  ? "bg-primary text-white"
-                  : "border border-gray-300"
-              } rounded-md hover:bg-gray-100`}
-            >
-              {page}
-            </button>
-          ))}
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-1 ${
+                  currentPage === page
+                    ? "bg-primary text-white"
+                    : "border border-gray-300"
+                } rounded-md`}
+              >
+                {page}
+              </button>
+            ))}
           <button
             onClick={() =>
               setCurrentPage(Math.min(currentPage + 1, totalPages))
