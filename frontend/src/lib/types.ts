@@ -16,9 +16,9 @@ export type Ticket = {
   customer: string
   vehicle?: string | null
   passiveContact: boolean
-  contactType: ContactType
+  contactType: ContactType | null
   status: TicketStatus
-  assignedTo?: User | null
+  assignedTo?: string | null
   userId?: string | null
   createdAt: Date
   updatedAt: Date
@@ -49,4 +49,41 @@ export enum TicketStatus {
 export enum Role {
   ADMIN = 'ADMIN',
   ATTENDANT = 'ATTENDANT'
+}
+
+export type UserInfo = {
+  email: string;
+  exp: number;
+  iat: number;
+  name: string;
+  role: string;
+  token: string;
+  userId: string;
+}
+
+// API requests
+
+export type getTicketsInput = {
+  page?: number
+  limit?: number
+  filters?: {
+    search?: string
+    type?: TicketType
+    orderBy?: string
+    status?: TicketStatus
+    reason?: string
+    customer?: string
+    assignedTo?: string
+    vehicle?: string
+    createdAt_lte?: Date
+    createdAt_gte?: Date
+  }
+}
+
+export type getTicketsOutput = {
+  tickets: Ticket[]
+  count: number
+  page: number
+  pageSize: number
+  totalPages: number
 }
