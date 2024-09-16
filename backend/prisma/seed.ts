@@ -4,7 +4,8 @@ import {
   TicketStatus,
   TicketType,
 } from "@prisma/client";
-import * as bcrypt from "bcrypt";
+import * as bcrypt from "bcryptjs";
+import crypto from 'crypto';
 
 /* 
   Run with `npm run seed`

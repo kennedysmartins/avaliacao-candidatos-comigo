@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { FiChevronDown, FiSearch } from "react-icons/fi";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
@@ -44,7 +44,7 @@ interface FiltersProps {
   view: "list" | "grid";
 }
 
-export default function Component({
+function ComponentContent({
   onFiltersChange,
   onViewChange,
   view,
@@ -224,5 +224,13 @@ export default function Component({
         />
       </div>
     </div>
+  );
+}
+
+export default function Component(props: FiltersProps) {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <ComponentContent {...props} />
+    </Suspense>
   );
 }

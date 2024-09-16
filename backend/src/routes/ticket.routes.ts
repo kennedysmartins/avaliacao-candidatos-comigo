@@ -1,8 +1,8 @@
 import express from "express"
 import * as ticketController from "../controllers/ticket.controller"
-import verifyToken from "@/middlewares/authMiddleware";
-import { validateData } from "@/middlewares/validationMiddleware";
-import { ticketSchema } from "@/schemas/ticketSchemas";
+import verifyToken from "../middlewares/authMiddleware";
+import { validateData } from "../middlewares/validationMiddleware";
+import { ticketSchema } from "../schemas/ticketSchemas";
 
 const router = express.Router()
 
