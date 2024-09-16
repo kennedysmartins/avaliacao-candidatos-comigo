@@ -11,7 +11,7 @@ import statusRoutes from './routes/status.routes';
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 4000;
+const port = process.env.BACKEND_PORT || 4000;
 
 app.use(cors());
 app.use(bodyParser.json());
