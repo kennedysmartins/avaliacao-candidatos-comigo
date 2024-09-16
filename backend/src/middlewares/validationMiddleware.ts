@@ -6,9 +6,6 @@ type ZodObjectSchema<T extends ZodRawShape> = ZodObject<T>;
 
 export function validateData<T extends ZodRawShape>(schema: ZodObjectSchema<T>) {
   return (req: Request, res: Response, next: NextFunction) => {
-    console.log("Incoming request body:", req.body);
-    console.log("Validation schema:", schema.shape);
-
     try {
       schema.parse(req.body);
       console.log("Validation passed");
