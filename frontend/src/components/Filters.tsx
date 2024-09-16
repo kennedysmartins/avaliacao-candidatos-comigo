@@ -1,18 +1,50 @@
 "use client";
-import { useState, useCallback, useEffect, useRef } from "react";
+
+import { useState, useCallback } from "react";
 import { FiChevronDown, FiSearch } from "react-icons/fi";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { getTicketsInput } from "@/lib/types";
 import { MdMenu, MdOutlineViewKanban } from "react-icons/md";
+import { TicketStatus, TicketType } from "@/lib/types";
+
+const vehicles = [
+  "Logan",
+  "Punto",
+  "Gol",
+  "Fusca",
+  "C4",
+  "HB20",
+  "Onix",
+  "Chevette",
+];
+const reasons = [
+  "Testes de Instalação",
+  "Melhorias no veículo",
+  "Nova Instalação",
+  "Aparelho corrompido",
+];
+const customers = [
+  "Kennedy",
+  "Renata",
+  "Javi",
+  "Rafael",
+  "Hanna",
+  "Lucas",
+  "Amanda",
+  "Joyce",
+  "Deriki",
+  "Rodrigo",
+  "Camila",
+  "Thiago",
+];
 
 interface FiltersProps {
-  onFiltersChange: (filters: getTicketsInput["filters"]) => void;
+  onFiltersChange: (filters: Record<string, string>) => void;
   onViewChange: (view: "list" | "grid") => void;
   view: "list" | "grid";
 }
 
-export default function Filters({
+export default function Component({
   onFiltersChange,
   onViewChange,
   view,
@@ -40,7 +72,11 @@ export default function Filters({
   const createQueryString = useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams.toString());
-      params.set(name, value);
+      if (value) {
+        params.set(name, value);
+      } else {
+        params.delete(name);
+      }
       return params.toString();
     },
     [searchParams]
@@ -48,34 +84,45 @@ export default function Filters({
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prevFilters) => {
-      const newFilters = {
-        ...prevFilters,
-        [key]: value,
-      };
+      const newFilters = { ...prevFilters, [key]: value };
 
-      if (key === "periodo" && value === "Hoje") {
+      if (key === "periodo") {
         const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
+        if (value === "Hoje") {
+          today.setHours(0, 0, 0, 0);
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          newFilters.createdAt_gte = today.toISOString();
+          newFilters.createdAt_lte = tomorrow.toISOString();
+        } else if (value === "Esta semana") {
+          const weekAgo = new Date(today);
+          weekAgo.setDate(today.getDate() - 7);
+          newFilters.createdAt_gte = weekAgo.toISOString();
+          newFilters.createdAt_lte = today.toISOString();
+        } else if (value === "Este mês") {
+          const monthAgo = new Date(today);
+          monthAgo.setDate(today.getDate() - 30);
+          newFilters.createdAt_gte = monthAgo.toISOString();
+          newFilters.createdAt_lte = today.toISOString();
+        } else {
+          newFilters.createdAt_gte = "";
+          newFilters.createdAt_lte = "";
+        }
+      }
 
-        newFilters.createdAt_gte = today.toISOString();
-        newFilters.createdAt_lte = tomorrow.toISOString();
-      } else if (key === "periodo" && value !== "Hoje") {
-        newFilters.createdAt_gte = "";
-        newFilters.createdAt_lte = "";
+      if (key === "Ordenado por") {
+        newFilters.orderBy = value === "Data da abertura" ? "asc" : "desc";
       }
 
       return newFilters;
     });
 
-    const newFilters: { [key: string]: string } = {};
+    const validFilters: Record<string, string> = {};
     Object.entries(filters).forEach(([key, value]) => {
-      if (value) {
-        newFilters[key] = value;
-      }
+      if (value) validFilters[key] = value;
     });
-    onFiltersChange(newFilters);
+
+    onFiltersChange(validFilters);
     router.push(pathname + "?" + createQueryString(key, value));
   };
 
@@ -83,7 +130,7 @@ export default function Filters({
     <div className='relative'>
       <button
         onClick={() => toggleDropdown(label)}
-        className='flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 '
+        className='flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50'
       >
         <span>
           {filters[label.toLowerCase() as keyof typeof filters] || label}
@@ -149,19 +196,16 @@ export default function Filters({
         </div>
 
         {renderDropdown("Periodo", ["Hoje", "Esta semana", "Este mês"])}
-        {renderDropdown("Ordenado por", [
-          "Data da abertura",
-          "Data de fechamento",
-        ])}
-        {renderDropdown("Status", ["Em andamento", "Concluído", "Cancelado"])}
-        {renderDropdown("Tipo", ["Tipo 1", "Tipo 2", "Tipo 3"])}
-        {renderDropdown("Motivo", ["Motivo 1", "Motivo 2", "Motivo 3"])}
-        {renderDropdown("Cliente", ["Cliente 1", "Cliente 2", "Cliente 3"])}
-        {renderDropdown("Veículo", ["Veículo 1", "Veículo 2", "Veículo 3"])}
+        {renderDropdown("Ordenado por", ["asc", "desc"])}
+        {renderDropdown("Status", Object.values(TicketStatus))}
+        {renderDropdown("Tipo", Object.values(TicketType))}
+        {renderDropdown("Motivo", reasons)}
+        {renderDropdown("Cliente", customers)}
+        {renderDropdown("Veículo", vehicles)}
 
         <div className='bg-gray-300 w-px h-6'></div>
         <button
-          className='flex items-center px-3 py-2 text-sm font-medium text-gray-700  rounded-md hover:bg-gray-50 focus:outline-none'
+          className='flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none'
           onClick={clearFilters}
         >
           Remover filtros
