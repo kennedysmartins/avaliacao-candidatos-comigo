@@ -13,7 +13,9 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.BACKEND_PORT || 4000;
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+}));
 app.use(bodyParser.json());
 app.use(express.static('public'));
 app.use('/tickets', ticketRoutes)
