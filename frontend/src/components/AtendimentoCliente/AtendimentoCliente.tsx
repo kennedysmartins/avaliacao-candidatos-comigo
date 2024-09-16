@@ -27,12 +27,16 @@ const AtendimentoCliente = () => {
     count: 0,
   });
 
-  const fetchTickets = async (appliedFilters: getTicketsInput["filters"]) => {
+  const fetchTickets = async () => {
     try {
       setLoading(true);
-      const queryString = new URLSearchParams(
-        appliedFilters as Record<string, string>
-      ).toString();
+      // @ts-expect-error temporary
+      const queryString = new URLSearchParams({
+        ...filters,
+        page: String(pagination.page),
+        pageSize: String(pagination.pageSize),
+      }).toString();
+
       const response = await getTickets({
         queryParams: queryString,
       });
@@ -63,7 +67,7 @@ const AtendimentoCliente = () => {
             },
           },
         });
-        fetchTickets(filters);
+        fetchTickets();
       }
     } catch (error) {
       console.error("Erro ao excluir ticket:", error);
@@ -75,7 +79,7 @@ const AtendimentoCliente = () => {
       const response = await undoDeletedTicketApi(ticketId);
       if (response.id) {
         toast.success("Ticket restaurado com sucesso!");
-        fetchTickets(filters);
+        fetchTickets();
       }
     } catch (error) {
       console.error("Erro ao restaurar ticket:", error);
@@ -83,15 +87,8 @@ const AtendimentoCliente = () => {
   };
 
   useEffect(() => {
-    fetchTickets(filters);
-  }, [filters]);
-
-  // Avoid refetching when modals are closed unless filters change
-  useEffect(() => {
-    if (!isAddModalOpen && !isEditModalOpen) {
-      fetchTickets(filters);
-    }
-  }, [filters, isAddModalOpen, isEditModalOpen]);
+    fetchTickets();
+  }, [filters, pagination.page, pagination.pageSize]);
 
   const handleFiltersChange = (newFilters: getTicketsInput["filters"]) => {
     setFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));
