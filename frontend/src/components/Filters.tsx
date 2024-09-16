@@ -183,7 +183,7 @@ function ComponentContent({
 
   return (
     <div className='bg-gray-100 p-4 flex items-center justify-between w-full'>
-      <div className='flex flex-wrap items-center gap-2'>
+      <div className='flex flex-wrap items-center gap-2 overflow-hidden flex-nowrap'>
         <div className='relative flex-grow'>
           <input
             type='text'

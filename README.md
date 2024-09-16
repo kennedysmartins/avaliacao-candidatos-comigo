@@ -1,6 +1,11 @@
-# Desafio Fullstack - Repositório de Implementação
+# Desafio Fullstack Comigo
 
 ### Link do desafio [aqui](https://github.com/comigotech/avaliacao-candidatos-fullstack)
+
+## Preview 🌐
+[![Preview do Site](./.github/comigo-preview.gif)](http://18.117.122.205:3000/)
+
+[🔗 Clique aqui para acessar](http://18.117.122.205:3000)
 
 ## Funcionalidades Implementadas
 ### Back-end:
@@ -22,39 +27,89 @@
 
 ---
 
-## Como Executar o Projeto
+## Instalação e Execução
 
-### Back-end
+Para executar o projeto localmente, siga os passos abaixo:
 
-#### Passos Docker:
+### Docker
+
 1. Clone o repositório.
-2. Com o docker instalado, execute  o comando `docker-compose up --build` para iniciar o banco, backend e frontend.
-3. O frontend estará disponível em `http://localhost:3000`, o backend estará disponível em `http://localhost:4000` e o banco de dados estará disponível em `http://localhost:5432`.
+```sh
+   git clone https://github.com/kennedysmartins/avaliacao-candidatos-comigo.git
+```
+2. Renomeie o arquivo `.env.example` para `.env` e configure as variáveis de ambiente.
+```sh
+    mv .env.example .env
+```
+3. Com o docker instalado, execute  o comando docker para iniciar o banco, backend e frontend.
+```sh
+   docker-compose up --build -d
+```
+4. O frontend estará disponível em `http://localhost:3000`, o backend estará disponível em `http://localhost:4000` e o banco de dados estará disponível em `http://localhost:5432`.
 
-### Passos node:
+### Backend:
+
 1. Clone o repositório.
+```sh
+   git clone https://github.com/kennedysmartins/avaliacao-candidatos-comigo.git
+```
 2. Execute o docker-compose up postgres para iniciar o banco ou crie um banco postgres com o nome `comigo` com  as credenciais `postgres` e `admin`.
+```sh
+   docker-compose up postgres
+```
 3. Entre na pasta `backend`.
-4. Instale as dependências com `npm install`.
-5. Execute o comando npx prisma migrate dev para criar as tabelas no banco de dados.
-6. Execute o comando `npm run seed` para popular o banco de dados com os dados de exemplo.
-7. Inicie o projeto com `npm run dev`. O backend estará rodando em `http://localhost:4000`.
+```sh
+   cd backend
+```
+4. Renomeie o arquivo `.env.example` para `.env` e configure as variáveis de ambiente.
+```sh
+    mv .env.example .env
+```
+5. Instale as dependências.
+```sh
+    npm install
+```
+6. Execute o comando para criar as tabelas no banco de dados.
+```sh
+    npx prisma migrate dev
+```
+7. Execute o comando para popular o banco de dados com os dados de exemplo.
+```sh
+   npm run seed
+```
+8. Inicie o projeto. O backend estará rodando em `http://localhost:4000`.
+```sh
+    npm run dev
+```
 
-#### Seed:
-- Execute o comando `npm run seed` para popular o banco de dados com os dados de exemplo.
+
+### Frontend:
+
+1. Clone o repositório.
+```sh
+   git clone https://github.com/kennedysmartins/avaliacao-candidatos-comigo.git
+```
+2. Entre na pasta `frontend`.
+```sh
+   cd frontend
+```
+3. Instale as dependências com `npm install`.
+```sh
+    npm install
+```
+4. Renome o arquivo `.env.local.example` para `.env.local` e configure as variáveis de ambiente.
+```sh
+    mv .env.local.example .env.local
+```
+5. Inicie o projeto. O front-end estará rodando em `http://localhost:3000`.
+```sh
+    npm run dev
+```
+6. Faça login com um dos usuários criados na seed.
 
 #### Logins:
+
 - Utilize os logins `atendente@comigo.com` senha `atendente` e `admin@comigo.com` senha `admin` para acessar o sistema.
-
-### Front-end
-
-#### Passos:
-1. Clone o repositório.
-2. Entre na pasta `frontend`.
-3. Instale as dependências com `npm install`.
-4. Inicie o projeto com `npm run dev`. O front-end estará rodando em `http://localhost:3000`.
-5. Faça login com um dos usuários criados na seed.
-
 ---
 
 ## Tecnologias Utilizadas
