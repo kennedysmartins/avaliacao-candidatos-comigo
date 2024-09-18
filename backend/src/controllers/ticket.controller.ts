@@ -46,17 +46,15 @@ export const getTickets = async (
       {
         reason: {
           contains: req.query.search as string,
-          mode: "insensitive",
         },
       },
       {
         description: {
           contains: req.query.search as string,
-          mode: "insensitive",
         },
       },
     ];
-  }
+}
 
   try {
     const page = parseInt(req.query.page as string) || 1;
