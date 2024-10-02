@@ -70,7 +70,7 @@ export default function LoginPage() {
                 className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
                 placeholder='E-mail'
               />
-              <p>admin@comigo.com</p>
+              <p className="text-red-500 text-sm cursor-copy" onClick={() => navigator.clipboard.writeText("admin@comigo.com")}>admin@comigo.com</p>
             </div>
             <div className="flex flex-col gap-1">
               <label htmlFor='password' className='sr-only'>
@@ -84,7 +84,7 @@ export default function LoginPage() {
                 className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
                 placeholder='Senha'
               />
-              <p className="text-red-500">admin</p>
+              <p className="text-red-500 text-sm cursor-copy" onClick={() => navigator.clipboard.writeText('admin')}>admin</p>
             </div>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
