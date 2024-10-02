@@ -58,7 +58,7 @@ export default function LoginPage() {
             sistemas da Comigo.
           </p>
           <form className='space-y-6' onSubmit={onSubmit}>
-            <div>
+            <div className="flex flex-col gap-1">
               <label htmlFor='email' className='sr-only'>
                 E-mail
               </label>
@@ -70,8 +70,9 @@ export default function LoginPage() {
                 className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
                 placeholder='E-mail'
               />
+              <p>admin@comigo.com</p>
             </div>
-            <div>
+            <div className="flex flex-col gap-1">
               <label htmlFor='password' className='sr-only'>
                 Senha
               </label>
@@ -83,6 +84,7 @@ export default function LoginPage() {
                 className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
                 placeholder='Senha'
               />
+              <p className="text-red-500">admin</p>
             </div>
             <div className='flex items-center justify-between'>
               <div className='flex items-center'>
