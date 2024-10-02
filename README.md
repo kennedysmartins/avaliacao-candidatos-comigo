@@ -3,9 +3,9 @@
 ### Link do desafio [aqui](https://github.com/comigotech/avaliacao-candidatos-fullstack)
 
 ## Preview 🌐
-[![Preview do Site](./.github/comigo-preview.gif)](http://18.117.122.205:3000/)
+[![Preview do Site](./.github/comigo-preview.gif)](https://avaliacao-candidatos-comigo.vercel.app)
 
-[🔗 Clique aqui para acessar](http://18.117.122.205:3000)
+[🔗 Clique aqui para acessar](https://avaliacao-candidatos-comigo.vercel.app)
 
 ## Funcionalidades Implementadas
 ### Back-end:

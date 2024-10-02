@@ -38,14 +38,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         localStorage.setItem("userInfo", JSON.stringify(userInfo));
         localStorage.setItem("token", userInfo.token);
         if (userInfo.token) {
-          const options = {
-            path: "/",
-            maxAge: 60 * 60 * 24 * 31,
-            sameSite: "strict",
-            secure: true,
-            httpOnly: true,
-          };
-          document.cookie = `token=${userInfo.token};path=${options.path};Max-Age=${options.maxAge};SameSite=${options.sameSite};Secure=${options.secure}`;
+          document.cookie = `token=${userInfo.token};path=/;Max-Age=${60 * 60 * 24 * 31}`;
         }
       }
     }
